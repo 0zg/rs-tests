@@ -1,0 +1,97 @@
+<link rel='icon' href='data:;base64,iVBORw0KGgo='>
+<style> div.ap { display: flex; justify-content: center; } </style>
+<link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css'/>
+
+<script src='https://code.jquery.com/jquery-3.1.1.min.js'></script>
+<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js'></script>
+<script src='https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js'></script>
+
+<body>
+ 
+<div class='ui-widget'>
+  <label for='species'>Zoek : </label>
+  <input id='species'>
+</div>
+ 
+<script type = 'text/javascript' >
+  $(function() {
+    function processDataCsv(allText) {
+      var record_num = 2;
+      var allTextLines = allText.split(/\r\n|\n/);
+      console.log('run processData()');
+      var lines = [];
+      var headings = allTextLines.shift().split(',');
+      while (allTextLines.length > 0) {
+        var tobj = {} , entry;
+        entry = allTextLines.shift().split(',');
+        tobj['label'] = entry[0];
+        tobj['value'] = entry[1];
+        lines.push(tobj);
+      }
+      return lines;
+    }
+
+    var myCSV = 'Species,Identifiant\r\n';
+    myCSV += 'Species A,320439\r\n';
+    myCSV += 'Species B,349450\r\n';
+    myCSV += 'Species C,43435904\r\n';
+    myCSV += 'Species D,320440\r\n';
+    myCSV += 'Species E,349451\r\n';
+    myCSV += 'Species F,43435905\r\n';
+    var lists = [];
+    lists = processDataCsv(myCSV);
+    var currentterm = '';
+
+    $('#species').autocomplete({
+      minLength: 3
+      , delay: 300
+      , source: lists
+      , focus: function(event, ui) {
+        $('#species').val(ui.item.label);
+        return false;
+      }
+    }).on('autocompletesearch', function(event, ui) {
+      var ssrs_term = $('#species').val();
+      if (currentterm != ssrs_term) {
+        console.log(ssrs_term);
+        var ssrs_url = 'https://sv2000136.frd.shsdir.nl/ReportServer_SSRS?/_Tests/self/test_autocomplete_v02_getcsv&rs:format=csv&term=' + ssrs_term;
+        var ssrs_url = 'http://localhost:1180/auto_getcsv.xlsx';
+        var ssrs_url = 'http://localhost/report?/test/auto_getcsv&rs:Format=EXCELOPENXML&term=' + ssrs_term;
+        console.log(ssrs_url);
+        console.log('downloading.');
+        var lines = [];
+        var req = new XMLHttpRequest();
+        req.open('GET', ssrs_url, true);
+        req.responseType = 'arraybuffer';
+        req.onload = function(e) {
+          var excel_data = new Uint8Array(req.response);
+          var wb = XLSX.read(excel_data, { type: 'array' });
+          console.log('downloading..process.xlsheet:' + wb.SheetNames[0]);
+          var ws = wb.Sheets[wb.SheetNames[0]];
+          var sheet_data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+          if (sheet_data.length > 0) {
+            for (var row = 0; row < sheet_data.length; row++) {
+              if (row == 0) {} else {
+                var tobj = {} , entry;
+                tobj['label'] = sheet_data[row][0];
+                tobj['value'] = sheet_data[row][1];
+                lines.push(tobj);
+              }
+            }
+          }
+          console.log('downloading...done')
+        }
+        req.onloadend = function(e) {
+          lists = lines;
+          $('#species').autocomplete('option', 'source', lists);
+          $('#species').autocomplete('search', ssrs_term);
+          currentterm = ssrs_term;
+          console.log('dropdown_autolist');
+        }
+        req.send()
+      }
+    })
+  });
+</script>
+
+</body>
