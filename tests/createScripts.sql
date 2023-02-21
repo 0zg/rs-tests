@@ -28,6 +28,7 @@ IF (SELECT count(1) WHERE @SearchWord like '%.%.%') = 1 --intellisense autocompl
 			ORDER BY columnname asc
 	end
 
+
 IF (SELECT count(1) WHERE @SearchWord like '%.%') = 1 --intellisense autocomplete table.columns
 BEGIN 
 	begin
