@@ -21,7 +21,7 @@ SET NOCOUNT ON;
 
 DECLARE @ReturnTable as TABLE ( 
       [MEMBER_CAPTION] nvarchar(4000), [UNIQUE_NAME] nvarchar(255), [EntityPath] nvarchar(255)
-	 -- , [id_bericht] bigint, datum_melding int,id_melding int,zaaknummer varchar(50),sofinr_num int
+
 	  )
 DECLARE @MembercaptionTable as TABLE ( [MEMBER_CAPTION] nvarchar(4000), [ilabel] nvarchar(4000) NULL )
 
