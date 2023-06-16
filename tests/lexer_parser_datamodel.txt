@@ -1,0 +1,45 @@
+-- oso 20230616  init Lexer and Parser datamodel (interpreter uses these to build queries)
+-- Lexer function fills queryTokenList, Parser fills QueryFilterList and QueryExtraKenmerkList
+
+tokenType_enum:
+startquery
+kenmerk
+punt
+waarde-is-ster
+waarde-left
+waarde-contains
+plusplus
+minmin
+dubbelpunt-eindfilter
+dubbelpunt-extrakenmerk
+extrakenmerk
+eindequery
+
+queryTokenList:
+tokenType : enum
+textString
+startPos
+prevTokenType
+nextTokenType
+
+filterType_enum:
+toonAlleenTop19
+plusplus-left
+plusplus-contains
+minmin-left
+minmin-contains
+
+queryFilterList:
+filterType : enum
+filterWaarde
+kenmerkNaam
+kenmerkDaxNaam
+DaxKeepfilterQuery
+startPos
+prevFilterType
+nextFilterType
+
+queryExtraKenmerkList:
+kenmerkNaam
+kenmerkDaxNaam
+startPos
